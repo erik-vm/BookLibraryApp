@@ -18,63 +18,48 @@ public class RepositoryAdmin {
         connection = DBUtil.getDBConnection();
     }
 
-    public void createAdminAccount() {
-        System.out.println("Please enter your name: ");
-        String firstName = scanner.nextLine();
-        System.out.println("Enter your lastname: ");
-        String lastName = scanner.nextLine();
-        System.out.println("Your date of birth YYYY-MM-DD");
-        Date dateOfBirth = Date.valueOf(scanner.nextLine());
-        System.out.println("Set your password: ");
-        String password = scanner.nextLine();
-
+    public void createAdminAccount() throws SQLException {
         String sql = "INSERT INTO admins (firstName, lastName, dateOfBirth, password) VALUES(?, ?, str_to_date(?, '%Y-%m-%d'), ?)";
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setString(1, firstName);
-            preparedStatement.setString(2, lastName);
-            preparedStatement.setDate(3, dateOfBirth);
-            preparedStatement.setString(4, password);
-            int result = preparedStatement.executeUpdate();
-            if (result > 0) {
-                System.out.println("Admin created.");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        preparedStatement = connection.prepareStatement(sql);
+        System.out.println("Please enter your name: ");
+        preparedStatement.setString(1, scanner.nextLine());
+        System.out.println("Enter your lastname: ");
+        preparedStatement.setString(2, scanner.nextLine());
+        System.out.println("Your date of birth YYYY-MM-DD");
+        preparedStatement.setDate(3, Date.valueOf(scanner.nextLine()));
+        System.out.println("Set your password: ");
+        preparedStatement.setString(4, scanner.nextLine());
+        int result = preparedStatement.executeUpdate();
+        if (result > 0) {
+            System.out.println("Admin created.");
         }
     }
 
-    private List<Admin> adminList() {
+    private List<Admin> adminList() throws SQLException {
         String sql = "SELECT * FROM admins";
         List<Admin> adminList = new ArrayList<>();
-        try {
-            preparedStatement = connection.prepareStatement(sql);
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Admin admin = new Admin();
-                admin.setAdminId(resultSet.getInt("adminId"));
-                admin.setFirstName(resultSet.getString("firstName"));
-                admin.setLastName(resultSet.getString("lastName"));
-                admin.setDateOfBirth(resultSet.getDate("dateOfBirth"));
-                admin.setPassword(resultSet.getString("password"));
-                adminList.add(admin);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        preparedStatement = connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            Admin admin = new Admin();
+            admin.setAdminId(resultSet.getInt("adminId"));
+            admin.setFirstName(resultSet.getString("firstName"));
+            admin.setLastName(resultSet.getString("lastName"));
+            admin.setDateOfBirth(resultSet.getDate("dateOfBirth"));
+            admin.setPassword(resultSet.getString("password"));
+            adminList.add(admin);
         }
         return adminList;
     }
 
-    public void showAllAdmins() {
+    public void showAllAdmins() throws SQLException {
         List<Admin> adminList = adminList();
         for (Admin admin : adminList) {
             System.out.println(admin);
         }
     }
 
-
-    private boolean doesAdminExist(int adminId) {
+    private boolean doesAdminExist(int adminId) throws SQLException {
         List<Admin> adminList = adminList();
         boolean result = false;
         for (Admin admin : adminList) {
@@ -85,7 +70,7 @@ public class RepositoryAdmin {
         return result;
     }
 
-    public boolean login() {
+    public boolean login() throws SQLException {
         boolean validUser = false;
         System.out.println("Enter your id: ");
         int adminId = scanner.nextInt();
@@ -93,28 +78,23 @@ public class RepositoryAdmin {
         if (doesAdminExist(adminId)) {
             System.out.println("Password: ");
             String password = scanner.nextLine();
-
             String sql = "SELECT * FROM admins WHERE adminId = ? ";
             Admin admin = new Admin();
-            try {
-                preparedStatement = connection.prepareStatement(sql);
-                preparedStatement.setInt(1, adminId);
-                resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    admin.setAdminId(resultSet.getInt("adminId"));
-                    admin.setFirstName(resultSet.getString("firstName"));
-                    admin.setLastName(resultSet.getString("lastName"));
-                    admin.setDateOfBirth(resultSet.getDate("dateOfBirth"));
-                    admin.setPassword(resultSet.getString("password"));
-                }
-                if (admin.getPassword().equals(password)) {
-                    validUser = true;
-                    System.out.println("Login successful.");
-                } else {
-                    System.out.println("Invalid password");
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, adminId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                admin.setAdminId(resultSet.getInt("adminId"));
+                admin.setFirstName(resultSet.getString("firstName"));
+                admin.setLastName(resultSet.getString("lastName"));
+                admin.setDateOfBirth(resultSet.getDate("dateOfBirth"));
+                admin.setPassword(resultSet.getString("password"));
+            }
+            if (admin.getPassword().equals(password)) {
+                validUser = true;
+                System.out.println("Login successful.");
+            } else {
+                System.out.println("Invalid password");
             }
         } else {
             System.out.println("Admin with " + adminId + " does not exist.");
@@ -144,15 +124,10 @@ public class RepositoryAdmin {
         preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, adminId);
         int result = preparedStatement.executeUpdate();
-        if (result>0){
+        if (result > 0) {
             System.out.println("Admin deleted.");
         }
     }
 
-    public String showPassword(){
-        String sql = "SELECT password FROM admins WHERE adminId = ?";
 
-
-
-    }
 }
