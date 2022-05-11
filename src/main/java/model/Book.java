@@ -8,7 +8,7 @@ public class Book {
     private String author;
     private genre genre;
     private int quantity;
-    enum genre{
+    public enum genre{
         COMEDY,
         DRAMA,
         CRIME,
@@ -53,5 +53,12 @@ public class Book {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return "-------------------------------------------------------------------------------------------------------" +
+                "\nID: " + bookId + " | Title: " + title +" | Author: " + author + " | Genre: " + genre + " | Quantity: " + quantity
+                +"\n-------------------------------------------------------------------------------------------------------";
     }
 }

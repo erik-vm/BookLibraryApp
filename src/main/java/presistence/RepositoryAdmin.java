@@ -60,9 +60,8 @@ public class RepositoryAdmin {
     }
 
     private boolean doesAdminExist(int adminId) throws SQLException {
-        List<Admin> adminList = adminList();
         boolean result = false;
-        for (Admin admin : adminList) {
+        for (Admin admin : adminList()) {
             if (admin.getAdminId() == adminId) {
                 result = true;
             }
@@ -78,16 +77,12 @@ public class RepositoryAdmin {
         if (doesAdminExist(adminId)) {
             System.out.println("Password: ");
             String password = scanner.nextLine();
-            String sql = "SELECT * FROM admins WHERE adminId = ? ";
+            String sql = "SELECT password, adminId FROM admins WHERE adminId = ? ";
             Admin admin = new Admin();
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, adminId);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                admin.setAdminId(resultSet.getInt("adminId"));
-                admin.setFirstName(resultSet.getString("firstName"));
-                admin.setLastName(resultSet.getString("lastName"));
-                admin.setDateOfBirth(resultSet.getDate("dateOfBirth"));
                 admin.setPassword(resultSet.getString("password"));
             }
             if (admin.getPassword().equals(password)) {
@@ -97,35 +92,25 @@ public class RepositoryAdmin {
                 System.out.println("Invalid password");
             }
         } else {
-            System.out.println("Admin with " + adminId + " does not exist.");
+            System.out.println("Admin with id " + adminId + " does not exist.");
         }
         return validUser;
-    }
-
-    public Admin returnAdminById(int adminId) throws SQLException {
-        String sql = "SELECT * FROM admins WHERE adminId = ?";
-        Admin admin = new Admin();
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, adminId);
-        resultSet = preparedStatement.executeQuery();
-        while (resultSet.next()) {
-            admin.setAdminId(resultSet.getInt("adminId"));
-            admin.setFirstName(resultSet.getString("firstName"));
-            admin.setLastName(resultSet.getString("lastName"));
-        }
-        return admin;
     }
 
     public void deleteAdmin() throws SQLException {
         System.out.println("Enter ID of admin to delete: ");
         int adminId = scanner.nextInt();
         scanner.nextLine();
-        String sql = "DELETE FROM admins WHERE adminId = ?";
-        preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, adminId);
-        int result = preparedStatement.executeUpdate();
-        if (result > 0) {
-            System.out.println("Admin deleted.");
+        if (doesAdminExist(adminId)) {
+            String sql = "DELETE FROM admins WHERE adminId = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, adminId);
+            int result = preparedStatement.executeUpdate();
+            if (result > 0) {
+                System.out.println("Admin deleted.");
+            }
+        }else {
+            System.out.println("Wrong ID input.");
         }
     }
 
