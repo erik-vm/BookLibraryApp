@@ -1,11 +1,15 @@
 package presistence;
 
+import model.Admin;
 import model.Book;
 import model.Member;
+import org.w3c.dom.ls.LSException;
 import util.DBUtil;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class RepositoryMember {
@@ -19,6 +23,7 @@ public class RepositoryMember {
     public RepositoryMember() {
         connection = DBUtil.getDBConnection();
         scanner = new Scanner(System.in);
+        repositoryBook = new RepositoryBook();
     }
 
     public void createMember() throws SQLException {
@@ -36,27 +41,78 @@ public class RepositoryMember {
         }
     }
 
-    public void loanBook() throws SQLException {
+    public void deleteMember(int memberId) throws SQLException{
+        String sql = "DELETE FROM members WHERE memberId = ?";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, memberId);
+        int result = preparedStatement.executeUpdate();
+        if (result>0){
+            System.out.println("Member deleted.");
+        }
+    }
+
+    public void showAllMembers() throws SQLException {
+        for (Member member : memberList()){
+            System.out.println(member);
+        }
+    }
+
+    private List<Member> memberList() throws SQLException {
+        List<Member> memberList = new ArrayList<>();
+        String sql = "SELECT * FROM members";
+        preparedStatement =connection.prepareStatement(sql);
+        while(resultSet.next()){
+            Member member = new Member();
+            member.setMemberId(resultSet.getInt("memberId"));
+            member.setFirstName(resultSet.getString("firstName"));
+            member.setLastName(resultSet.getString("lastName"));
+            member.setDateOfBirth(resultSet.getDate("dateOfBirth"));
+            memberList.add(member);
+        }
+        return memberList;
+    }
+
+    public boolean doesMemberExist(int memberId) throws SQLException {
+        boolean doesExist = false;
+        for (Member member : memberList()) {
+            if (member.getMemberId() == memberId){
+                doesExist = true;
+            }
+        }
+        return doesExist;
+    }
+
+    public void loanBook(int memberId) throws SQLException {
         System.out.println("Enter book id to loan: ");
         int bookId = scanner.nextInt();
-        int memberId = 0;
+        Book book = null;
+        Member member = null;
         scanner.nextLine();
         if (repositoryBook.doesBookExist(bookId)) {
-            String sql = "SELECT * FROM books b LEFT OUTER JOIN members m ON b.memberId = m.memberId ";
+            String sql = "SELECT memberId, returnDate FROM books WHERE bookId = ? ";
             preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, bookId);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Book book = new Book();
-                Member member = new Member();
-                book.setMemberId(resultSet.getInt("b.memberId"));
+                book = new Book();
+                book.setMemberId(resultSet.getInt("memberId"));
                 book.setReturnDate(resultSet.getDate("returnDate"));
-                member.setMemberId(resultSet.getInt("m.memberId"));
-                memberId = member.getMemberId();
+
                 if (book.getMemberId() != 0) {
                     System.out.println("Sorry, but book is loaned out. It will be returned: " + book.getReturnDate());
                 } else {
-                    String sql2 = "UPDATE books SET memberId = ? , returnDate = str_to_date(?, '%Y-%m-%d') WHERE bookId = ?";
-                    preparedStatement = connection.prepareStatement(sql2);
+                    String sql2 = "SELECT firstName, lastName FROM members WHERE memberId = ?";
+                    preparedStatement = connection.prepareStatement(sql);
+                    preparedStatement.setInt(1, memberId);
+                    resultSet = preparedStatement.executeQuery();
+                    while (resultSet.next()) {
+                        member = new Member();
+                        member.setMemberId(resultSet.getInt("memberId"));
+                        member.setFirstName(resultSet.getString("firstName"));
+                        member.setLastName(resultSet.getString("lastName"));
+                    }
+                    String sql3 = "UPDATE books SET memberId = ? , returnDate = str_to_date(?, '%Y-%m-%d') WHERE bookId = ?";
+                    preparedStatement = connection.prepareStatement(sql3);
                     LocalDate localDate = LocalDate.now();
                     localDate = localDate.plusDays(14);
                     preparedStatement.setInt(1, memberId);
@@ -67,11 +123,48 @@ public class RepositoryMember {
                         System.out.println("Book loaned");
                     }
                 }
+
+
             }
         } else {
             System.out.println("Book with id " + bookId + " doesn't exist in our library.");
         }
     }
 
+    public void returnBook(int memberId) throws SQLException {
+        String sql = "UPDATE books SET memberId = NULL, returnDate = NULL WHERE bookId = ? ";
+        memberCurrentBooksPrint(memberId);
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, scanner.nextInt());
+        int result = preparedStatement.executeUpdate();
+        if (result > 0) {
+            System.out.println("Book returned.");
+        }
+    }
+
+    private List<Book> showMembersCurrentBooks(int memberId) throws SQLException {
+        List<Book> bookList = new ArrayList<>();
+        String sql = "SELECT * FROM books WHERE memberId = ?";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setInt(1, memberId);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            Book book = new Book();
+            book.setBookId(resultSet.getInt("bookId"));
+            book.setTitle(resultSet.getString("title"));
+            book.setAuthor(resultSet.getString("author"));
+            book.setGenre(Book.genre.valueOf(resultSet.getString("genre")));
+            book.setReturnDate(resultSet.getDate("returnDate"));
+            book.setMemberId(resultSet.getInt("memberId"));
+            bookList.add(book);
+        }
+        return bookList;
+    }
+
+    public void memberCurrentBooksPrint(int memberId) throws SQLException {
+        for (Book book : showMembersCurrentBooks(memberId)) {
+            System.out.println(book);
+        }
+    }
 
 }

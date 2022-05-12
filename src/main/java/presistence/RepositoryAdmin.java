@@ -70,11 +70,8 @@ public class RepositoryAdmin {
         return result;
     }
 
-    public boolean login() throws SQLException {
+    public boolean login(int adminId) throws SQLException {
         boolean validUser = false;
-        System.out.println("Enter your id: ");
-        int adminId = scanner.nextInt();
-        scanner.nextLine();
         if (doesAdminExist(adminId)) {
             System.out.println("Password: ");
             String password = scanner.nextLine();

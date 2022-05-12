@@ -26,24 +26,12 @@ public class Book {
         this.bookId = bookId;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public String getAuthor() {
-        return author;
-    }
-
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public Book.genre getGenre() {
-        return genre;
     }
 
     public void setGenre(Book.genre genre) {
@@ -68,9 +56,9 @@ public class Book {
 
     @Override
     public String toString() {
-        return "-------------------------------------------------------------------------------------------------------" +
+        return "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------" +
                 "\nID: " + bookId + " | Title: " + title + " | Author: " + author + " | Genre: " + genre + " | Return date: " + returnDate + " | Member ID : " + memberId
-                + "\n-------------------------------------------------------------------------------------------------------";
+                + "\n-----------------------------------------------------------------------------------------------------------------------------------------------------------------------";
     }
 
     public boolean isBookAvailable(){
