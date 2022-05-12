@@ -1,9 +1,7 @@
 package presistence;
 
-import model.Admin;
 import model.Book;
 import model.Member;
-import org.w3c.dom.ls.LSException;
 import util.DBUtil;
 
 import java.sql.*;
@@ -52,15 +50,17 @@ public class RepositoryMember {
     }
 
     public void showAllMembers() throws SQLException {
+
         for (Member member : memberList()){
             System.out.println(member);
         }
     }
 
-    private List<Member> memberList() throws SQLException {
+    public List<Member> memberList() throws SQLException {
         List<Member> memberList = new ArrayList<>();
         String sql = "SELECT * FROM members";
         preparedStatement =connection.prepareStatement(sql);
+        resultSet = preparedStatement.executeQuery();
         while(resultSet.next()){
             Member member = new Member();
             member.setMemberId(resultSet.getInt("memberId"));
@@ -133,6 +133,7 @@ public class RepositoryMember {
 
     public void returnBook(int memberId) throws SQLException {
         String sql = "UPDATE books SET memberId = NULL, returnDate = NULL WHERE bookId = ? ";
+        System.out.println("Enter id of a book you want to return: ");
         memberCurrentBooksPrint(memberId);
         preparedStatement = connection.prepareStatement(sql);
         preparedStatement.setInt(1, scanner.nextInt());

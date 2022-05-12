@@ -33,6 +33,6 @@ public class Member {
 
     @Override
     public String toString() {
-        return "Member id: " + memberId + " | Firstname " + firstName + " | Lastname" + lastName + " | DOB: " + dateOfBirth;
+        return "Member id: " + memberId + " | Firstname: " + firstName + " | Lastname: " + lastName + " | DOB: " + dateOfBirth;
     }
 }

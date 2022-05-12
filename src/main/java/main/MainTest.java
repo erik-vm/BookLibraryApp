@@ -1,6 +1,5 @@
 package main;
 
-;
 import presistence.RepositoryAdmin;
 import presistence.RepositoryBook;
 import presistence.RepositoryMember;
@@ -104,7 +103,7 @@ public class MainTest {
 
     static void memberMenu(int memberId) throws SQLException {
         System.out.println("-------------------------------------------------------------------------------------------------------" +
-                "\n0 - Show menu\n1 - Show all books \n\t2 - Show books I have \n3 - Loan a book \n4 - Return a book \n5 - Delete your account. " +
+                "\n0 - Show menu\n1 - Show all books \n2 - Show books I have \n3 - Loan a book \n4 - Return a book \n5 - Delete your account. " +
                 "\n\n9 - Quit" +
                 "\n-------------------------------------------------------------------------------------------------------");
         boolean quit = false;
@@ -133,6 +132,7 @@ public class MainTest {
                     break;
                 case 5:
                     repositoryMember.deleteMember(memberId);
+                    quit = true;
                     break;
                 case 9:
                     quit = true;
