@@ -1,14 +1,17 @@
 package model;
 
 
+import java.sql.Date;
 
 public class Book {
     private int bookId;
     private String title;
     private String author;
     private genre genre;
-    private int quantity;
-    public enum genre{
+    private Date returnDate;
+    private int memberId;
+
+    public enum genre {
         COMEDY,
         DRAMA,
         CRIME,
@@ -47,18 +50,30 @@ public class Book {
         this.genre = genre;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public Date getReturnDate() {
+        return returnDate;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public int getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(int memberId) {
+        this.memberId = memberId;
     }
 
     @Override
     public String toString() {
         return "-------------------------------------------------------------------------------------------------------" +
-                "\nID: " + bookId + " | Title: " + title +" | Author: " + author + " | Genre: " + genre + " | Quantity: " + quantity
-                +"\n-------------------------------------------------------------------------------------------------------";
+                "\nID: " + bookId + " | Title: " + title + " | Author: " + author + " | Genre: " + genre + " | Return date: " + returnDate + " | Member ID : " + memberId
+                + "\n-------------------------------------------------------------------------------------------------------";
+    }
+
+    public boolean isBookAvailable(){
+        return memberId != 0;
     }
 }

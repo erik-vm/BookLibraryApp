@@ -12,13 +12,14 @@ public class RepositoryAdmin {
     PreparedStatement preparedStatement;
     ResultSet resultSet;
     Connection connection;
-    Scanner scanner = new Scanner(System.in);
+    Scanner scanner;
 
     public RepositoryAdmin() {
         connection = DBUtil.getDBConnection();
+        scanner = new Scanner(System.in);
     }
 
-    public void createAdminAccount() throws SQLException {
+    public void createAdmin() throws SQLException {
         String sql = "INSERT INTO admins (firstName, lastName, dateOfBirth, password) VALUES(?, ?, str_to_date(?, '%Y-%m-%d'), ?)";
         preparedStatement = connection.prepareStatement(sql);
         System.out.println("Please enter your name: ");
@@ -109,7 +110,7 @@ public class RepositoryAdmin {
             if (result > 0) {
                 System.out.println("Admin deleted.");
             }
-        }else {
+        } else {
             System.out.println("Wrong ID input.");
         }
     }

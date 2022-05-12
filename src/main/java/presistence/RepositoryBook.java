@@ -3,10 +3,7 @@ package presistence;
 import model.Book;
 import util.DBUtil;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,10 +12,11 @@ public class RepositoryBook {
     PreparedStatement preparedStatement;
     ResultSet resultSet;
     Connection connection;
-    Scanner scanner = new Scanner(System.in);
+    Scanner scanner ;
 
     public RepositoryBook() {
         connection = DBUtil.getDBConnection();
+        scanner = new Scanner(System.in);
     }
 
     public void addBook() throws SQLException {
@@ -54,7 +52,7 @@ public class RepositoryBook {
         }
     }
 
-    private boolean doesBookExist(int bookId) throws SQLException {
+    public boolean doesBookExist(int bookId) throws SQLException {
         boolean result = false;
         for (Book book : bookList()) {
             if (book.getBookId() == bookId) {
@@ -82,7 +80,8 @@ public class RepositoryBook {
             book.setTitle(resultSet.getString("title"));
             book.setAuthor(resultSet.getString("author"));
             book.setGenre(Book.genre.valueOf(resultSet.getString("genre")));
-            book.setQuantity(resultSet.getInt("quantity"));
+            book.setReturnDate(resultSet.getDate("returnDate"));
+            book.setMemberId(resultSet.getInt("memberId"));
             bookList.add(book);
         }
         return bookList;
@@ -111,14 +110,15 @@ public class RepositoryBook {
         preparedStatement.setInt(2, bookId);
         preparedStatement.execute();
     }
-
-    private void modifyQuantity(int newQuantity, int bookId) throws SQLException {
-        String sql = "UPDATE books SET quantity = ? WHERE bookId = ?";
+    private void modifyReturnDate(String newDate, int bookId) throws SQLException {
+        String sql = "UPDATE books SET returnDate = str_to_date(?, '%Y-%m-%d') where bookId = ?";
         preparedStatement = connection.prepareStatement(sql);
-        preparedStatement.setInt(1, newQuantity);
+        preparedStatement.setString(1, newDate);
         preparedStatement.setInt(2, bookId);
         preparedStatement.execute();
     }
+
+
 
     public void modifyBook() throws SQLException {
         showAllBooks();
@@ -136,9 +136,8 @@ public class RepositoryBook {
                 book.setTitle(resultSet.getString("title"));
                 book.setAuthor(resultSet.getString("author"));
                 book.setGenre(Book.genre.valueOf(resultSet.getString("genre").toUpperCase()));
-                book.setQuantity(resultSet.getInt("quantity"));
                 System.out.println(book);
-                System.out.println("Select attribute to change: \n\t1 - Title\n\t2 - Author\n\t3 - Genre\n\t4 - Quantity");
+                System.out.println("Select attribute to change: \n\t1 - Title\n\t2 - Author\n\t3 - Genre\n\t4 - Return date");
                 int choice = scanner.nextInt();
                 scanner.nextLine();
                 switch (choice) {
@@ -155,8 +154,8 @@ public class RepositoryBook {
                         modifyGenre(scanner.nextLine(), bookId);
                         break;
                     case 4:
-                        System.out.println("Enter new quantity:");
-                        modifyQuantity(scanner.nextInt(), bookId);
+                        System.out.println("Enter new return date : YYYY-MM-DD");
+                        modifyReturnDate(scanner.nextLine(), bookId);
                         scanner.nextLine();
                         break;
                     default:

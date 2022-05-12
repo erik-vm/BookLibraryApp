@@ -2,6 +2,7 @@ package main;
 ;
 import presistence.RepositoryAdmin;
 import presistence.RepositoryBook;
+import presistence.RepositoryMember;
 
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -10,12 +11,16 @@ public class MainTest {
     static Scanner scanner = new Scanner(System.in);
     static RepositoryAdmin repositoryAdmin = new RepositoryAdmin();
     static RepositoryBook repositoryBook = new RepositoryBook();
+    static RepositoryMember repositoryMember = new RepositoryMember();
 
     public static void main(String[] args) throws SQLException {
 
 
+        repositoryMember.loanBook();
+
+
         boolean quit = false;
-        while (!quit) {
+      /*  while (!quit) {
             System.out.println("-------------------------------------------------------------------------------------------------------" +
                     "\nSelect role: \n\t1 - Admin \n\t2 - Member \n\t3 - Quest \n\n\t9 - Quit" +
                     "\n-------------------------------------------------------------------------------------------------------");
@@ -31,7 +36,7 @@ public class MainTest {
                     quit = true;
                     break;
             }
-        }
+        }*/
 
     }
 
@@ -58,7 +63,7 @@ public class MainTest {
                     repositoryAdmin.showAllAdmins();
                     break;
                 case 2:
-                    repositoryAdmin.createAdminAccount();
+                    repositoryAdmin.createAdmin();
                     break;
                 case 3:
                     repositoryAdmin.deleteAdmin();
